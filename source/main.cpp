@@ -38,7 +38,7 @@ int cutout_get_data(size_t offset, size_t length, float *out_ptr) {
     // read byte for byte
     while (bytes_left != 0) {
         // find location of the byte in the cutout
-        size_t cutout_row = floor(offset / CUTOUT_ROWS);
+        size_t cutout_row = floor(offset / CUTOUT_COLS);
         size_t cutout_col = offset - (cutout_row * CUTOUT_COLS);
 
         // then read the value from the real frame buffer
