@@ -1,3 +1,4 @@
 build/
 *.gcda
 deploy.zip
+.vscode

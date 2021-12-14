@@ -24,13 +24,13 @@
  * limitations under the License.
  */
 
-#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/statistics_functions.h"
 #include <limits.h>
 #include <math.h>
 
 
 /**
- * @addtogroup groupStats
+ * @addtogroup Entropy
  * @{
  */
 
@@ -46,8 +46,8 @@
 
 #if defined(ARM_MATH_MVEF) && !defined(ARM_MATH_AUTOVECTORIZE)
 
-#include "arm_helium_utils.h"
-#include "arm_vec_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_helium_utils.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_vec_math.h"
 
 float32_t arm_entropy_f32(const float32_t * pSrcA,uint32_t blockSize)
 {
@@ -168,5 +168,5 @@ float32_t arm_entropy_f32(const float32_t * pSrcA,uint32_t blockSize)
 #endif /* defined(ARM_MATH_MVEF) && !defined(ARM_MATH_AUTOVECTORIZE) */
 
 /**
- * @} end of groupStats group
+ * @} end of Entropy group
  */

@@ -25,13 +25,13 @@
  * limitations under the License.
  */
 
-#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/distance_functions.h"
 #include <limits.h>
 #include <math.h>
 
 
 /**
-  @addtogroup FloatDist
+  @addtogroup Chebyshev
   @{
  */
 
@@ -47,8 +47,8 @@
 
 #if defined(ARM_MATH_MVEF) && !defined(ARM_MATH_AUTOVECTORIZE)
 
-#include "arm_helium_utils.h"
-#include "arm_vec_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_helium_utils.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_vec_math.h"
 
 float32_t arm_chebyshev_distance_f32(const float32_t *pA,const float32_t *pB, uint32_t blockSize)
 {
@@ -207,5 +207,5 @@ float32_t arm_chebyshev_distance_f32(const float32_t *pA,const float32_t *pB, ui
 
 
 /**
- * @} end of FloatDist group
+ * @} end of Chebyshev group
  */

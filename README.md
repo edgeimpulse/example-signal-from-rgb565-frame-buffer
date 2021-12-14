@@ -24,8 +24,17 @@ To run this application:
 This has now created two files:
 
 * [framebuffer.bmp](framebuffer.bmp) - a 'fake' framebuffer that was created in RGB565 format.
-* [from_signal.bpm](from_signal.bmp) - the image as received by the classifier. This went through RGB565->RGB888 conversion, and through the cutout.
+* [from_signal.bmp](from_signal.bmp) - the image as received by the classifier. This went through RGB565->RGB888 conversion, and through the cutout.
 
+### How to test squashing/resizing
+Instead of just cutting out part of the image, you can also just crop down to the same aspect ratio, then squash/resize (bilinear interpolation) the rest of the image.  This preserves more of your frame. To try this, run the following
+```
+make squash
+```
+
+Then run the application, same as above.  
+* [framebuffer.bmp](framebuffer.bmp) - The original, non squashed image
+* [squashed_from_signal.bmp](squashed_from_signal.bmp) - the image as received by the classifier. This was cropped, then squashed
 ## Questions?
 
 Let us know on the [forums](https://forum.edgeimpulse.com).

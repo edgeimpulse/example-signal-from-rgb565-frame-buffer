@@ -26,7 +26,7 @@
  * limitations under the License.
  */
 
-#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/filtering_functions.h"
 
 /**
   @defgroup FIR_Interpolate Finite Impulse Response (FIR) Interpolator
@@ -131,7 +131,7 @@
 
 #if defined(ARM_MATH_MVEF) && !defined(ARM_MATH_AUTOVECTORIZE)
 
-#include "arm_helium_utils.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_helium_utils.h"
 
 static void arm_fir_interpolate2_f32_mve(
   const arm_fir_interpolate_instance_f32 * S,

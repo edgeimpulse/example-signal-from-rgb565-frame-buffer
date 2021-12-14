@@ -7,7 +7,7 @@ echo "Building standalone classifier"
 
 cd $SCRIPTPATH
 
-make -j -f Makefile.tflite
+make -j -f Makefile
 
 echo "Building standalone classifier OK"
 

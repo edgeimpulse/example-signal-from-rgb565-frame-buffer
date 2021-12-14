@@ -1,5 +1,5 @@
 /* Edge Impulse inferencing library
- * Copyright (c) 2020 EdgeImpulse Inc.
+ * Copyright (c) 2021 EdgeImpulse Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 #include "../ei_classifier_porting.h"
 #if EI_PORTING_MBED == 1
 
-#include "tensorflow/lite/micro/debug_log.h"
+#include "edge-impulse-sdk/tensorflow/lite/micro/debug_log.h"
 #include <stdio.h>
 #include <stdarg.h>
 

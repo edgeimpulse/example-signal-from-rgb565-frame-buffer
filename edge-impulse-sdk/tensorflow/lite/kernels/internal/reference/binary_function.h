@@ -15,17 +15,14 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_KERNELS_INTERNAL_REFERENCE_BINARY_FUNCTION_H_
 #define TENSORFLOW_LITE_KERNELS_INTERNAL_REFERENCE_BINARY_FUNCTION_H_
 
-#include "tensorflow/lite/kernels/internal/common.h"
-#include "tensorflow/lite/kernels/internal/compatibility.h"
-#include "tensorflow/lite/kernels/internal/types.h"
+#include "edge-impulse-sdk/tensorflow/lite/kernels/internal/common.h"
+#include "edge-impulse-sdk/tensorflow/lite/kernels/internal/compatibility.h"
+#include "edge-impulse-sdk/tensorflow/lite/kernels/internal/types.h"
 
 namespace tflite {
 
 namespace reference_ops {
 
-// TODO(ycling): Refactoring. Remove BroadcastLogical and use the more
-// generalized and efficient BroadcastBinaryFunction.
-//
 // Also appears to duplicate MinimumMaximum.
 //
 // R: Result type. T1: Input 1 type. T2: Input 2 type.
@@ -63,7 +60,6 @@ inline void BroadcastBinaryFunction4DSlow(
 }
 
 // R: Result type. T1: Input 1 type. T2: Input 2 type.
-// TODO(renjieliu): Refactor other binary functions to use this one.
 template <typename R, typename T1, typename T2>
 inline void BinaryFunction(const RuntimeShape& input1_shape,
                            const T1* input1_data,

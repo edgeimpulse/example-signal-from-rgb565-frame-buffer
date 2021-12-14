@@ -1,5 +1,5 @@
 /* Edge Impulse inferencing library
- * Copyright (c) 2020 EdgeImpulse Inc.
+ * Copyright (c) 2021 EdgeImpulse Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 #define _EDGE_IMPULSE_ALIGNED_MALLOC_H_
 
 #include <assert.h>
+#include "../porting/ei_classifier_porting.h"
 
 #ifdef __cplusplus
 namespace {
@@ -51,7 +52,7 @@ typedef uint16_t offset_t;
 *	We will call malloc with extra bytes for our header and the offset
 *	required to guarantee the desired alignment.
 */
-__attribute__((unused)) void * ei_aligned_malloc(size_t align, size_t size)
+__attribute__((unused)) void * ei_aligned_calloc(size_t align, size_t size)
 {
 	void * ptr = NULL;
 
@@ -65,7 +66,7 @@ __attribute__((unused)) void * ei_aligned_malloc(size_t align, size_t size)
 		 * We also allocate extra bytes to ensure we can meet the alignment
 		 */
 		uint32_t hdr_size = PTR_OFFSET_SZ + (align - 1);
-		void * p = malloc(size + hdr_size);
+		void * p = ei_calloc(size + hdr_size, 1);
 
 		if(p)
 		{
@@ -103,7 +104,7 @@ __attribute__((unused)) void ei_aligned_free(void * ptr)
 	* Once we have the offset, we can get our original pointer and call free
 	*/
 	void * p = (void *)((uint8_t *)ptr - offset);
-	free(p);
+	ei_free(p);
 }
 
 #ifdef __cplusplus

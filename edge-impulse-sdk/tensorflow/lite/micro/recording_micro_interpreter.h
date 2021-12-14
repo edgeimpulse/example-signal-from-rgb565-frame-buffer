@@ -16,8 +16,8 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_MICRO_RECORDING_MICRO_INTERPRETER_H_
 #define TENSORFLOW_LITE_MICRO_RECORDING_MICRO_INTERPRETER_H_
 
-#include "tensorflow/lite/micro/micro_interpreter.h"
-#include "tensorflow/lite/micro/recording_micro_allocator.h"
+#include "edge-impulse-sdk/tensorflow/lite/micro/micro_interpreter.h"
+#include "edge-impulse-sdk/tensorflow/lite/micro/recording_micro_allocator.h"
 
 namespace tflite {
 
@@ -44,6 +44,13 @@ class RecordingMicroInterpreter : public MicroInterpreter {
                          error_reporter),
         recording_micro_allocator_(
             static_cast<const RecordingMicroAllocator&>(allocator())) {}
+
+  RecordingMicroInterpreter(const Model* model,
+                            const MicroOpResolver& op_resolver,
+                            RecordingMicroAllocator* allocator,
+                            ErrorReporter* error_reporter)
+      : MicroInterpreter(model, op_resolver, allocator, error_reporter),
+        recording_micro_allocator_(*allocator) {}
 
   const RecordingMicroAllocator& GetMicroAllocator() const {
     return recording_micro_allocator_;

@@ -24,16 +24,16 @@
  * limitations under the License.
  */
 
-#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/svm_functions.h"
 #include <limits.h>
 #include <math.h>
 
 #if defined(ARM_MATH_NEON) && !defined(ARM_MATH_AUTOVECTORIZE)
-#include "arm_vec_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_vec_math.h"
 #endif
 
 /**
- * @addtogroup groupSVM
+ * @addtogroup polysvm
  * @{
  */
 
@@ -49,8 +49,8 @@
 
 #if defined(ARM_MATH_MVEF) && !defined(ARM_MATH_AUTOVECTORIZE)
 
-#include "arm_helium_utils.h"
-#include "arm_vec_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_helium_utils.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_vec_math.h"
 
 void arm_svm_polynomial_predict_f32(
     const arm_svm_polynomial_instance_f32 *S,
@@ -484,5 +484,5 @@ void arm_svm_polynomial_predict_f32(
 
 
 /**
- * @} end of groupSVM group
+ * @} end of polysvm group
  */

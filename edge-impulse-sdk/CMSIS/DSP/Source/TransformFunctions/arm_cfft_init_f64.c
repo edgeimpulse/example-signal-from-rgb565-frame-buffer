@@ -49,9 +49,9 @@
                 variables declared in arm_const_structs.h
  */
 
-#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/transform_functions.h"
 #include "edge-impulse-sdk/CMSIS/DSP/Include/arm_common_tables.h"
-#include "arm_const_structs.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_const_structs.h"
 
 
 arm_status arm_cfft_init_f64(

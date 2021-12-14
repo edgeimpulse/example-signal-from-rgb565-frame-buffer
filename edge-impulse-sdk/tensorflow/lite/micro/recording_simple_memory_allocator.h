@@ -16,8 +16,8 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_MICRO_RECORDING_SIMPLE_MEMORY_ALLOCATOR_H_
 #define TENSORFLOW_LITE_MICRO_RECORDING_SIMPLE_MEMORY_ALLOCATOR_H_
 
-#include "tensorflow/lite/micro/compatibility.h"
-#include "tensorflow/lite/micro/simple_memory_allocator.h"
+#include "edge-impulse-sdk/tensorflow/lite/micro/compatibility.h"
+#include "edge-impulse-sdk/tensorflow/lite/micro/simple_memory_allocator.h"
 
 namespace tflite {
 
@@ -47,11 +47,12 @@ class RecordingSimpleMemoryAllocator : public SimpleMemoryAllocator {
   // Returns the number of alloc calls from the head or tail.
   size_t GetAllocatedCount() const;
 
-  uint8_t* AllocateFromHead(size_t size, size_t alignment) override;
+  TfLiteStatus SetHeadBufferSize(size_t size, size_t alignment) override;
   uint8_t* AllocateFromTail(size_t size, size_t alignment) override;
 
  private:
-  size_t requested_bytes_;
+  size_t requested_head_bytes_;
+  size_t requested_tail_bytes_;
   size_t used_bytes_;
   size_t alloc_count_;
 

@@ -15,11 +15,11 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_MICRO_MICRO_OP_RESOLVER_H_
 #define TENSORFLOW_LITE_MICRO_MICRO_OP_RESOLVER_H_
 
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/core/api/error_reporter.h"
-#include "tensorflow/lite/core/api/flatbuffer_conversions.h"
-#include "tensorflow/lite/core/api/op_resolver.h"
-#include "tensorflow/lite/schema/schema_generated.h"
+#include "edge-impulse-sdk/tensorflow/lite/c/common.h"
+#include "edge-impulse-sdk/tensorflow/lite/core/api/error_reporter.h"
+#include "edge-impulse-sdk/tensorflow/lite/core/api/flatbuffer_conversions.h"
+#include "edge-impulse-sdk/tensorflow/lite/core/api/op_resolver.h"
+#include "edge-impulse-sdk/tensorflow/lite/schema/schema_generated.h"
 
 namespace tflite {
 
@@ -34,12 +34,7 @@ namespace tflite {
 // registered Ops as the template parameter.
 class MicroOpResolver : public OpResolver {
  public:
-  // TODO(b/149408647): The op_type parameter enables a gradual transfer to
-  // selective registration of the parse function. It should be removed once we
-  // no longer need to use ParseOpData (from flatbuffer_conversions.h) as part
-  // of the MicroMutableOpResolver.
   typedef TfLiteStatus (*BuiltinParseFunction)(const Operator* op,
-                                               BuiltinOperator op_type,
                                                ErrorReporter* error_reporter,
                                                BuiltinDataAllocator* allocator,
                                                void** builtin_data);

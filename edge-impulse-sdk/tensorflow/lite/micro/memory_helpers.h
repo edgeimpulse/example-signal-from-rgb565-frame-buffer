@@ -18,9 +18,9 @@ limitations under the License.
 #include <cstddef>
 #include <cstdint>
 
-#include "tensorflow/lite/c/common.h"
-#include "tensorflow/lite/core/api/error_reporter.h"
-#include "tensorflow/lite/schema/schema_generated.h"
+#include "edge-impulse-sdk/tensorflow/lite/c/common.h"
+#include "edge-impulse-sdk/tensorflow/lite/core/api/error_reporter.h"
+#include "edge-impulse-sdk/tensorflow/lite/schema/schema_generated.h"
 
 namespace tflite {
 
@@ -34,13 +34,25 @@ uint8_t* AlignPointerDown(uint8_t* data, size_t alignment);
 size_t AlignSizeUp(size_t size, size_t alignment);
 
 // Returns size in bytes for a given TfLiteType.
-TfLiteStatus TfLiteTypeSizeOf(TfLiteType type, size_t* size,
-                              ErrorReporter* reporter);
+TfLiteStatus TfLiteTypeSizeOf(TfLiteType type, size_t* size);
 
 // How many bytes are needed to hold a tensor's contents.
 TfLiteStatus BytesRequiredForTensor(const tflite::Tensor& flatbuffer_tensor,
                                     size_t* bytes, size_t* type_size,
                                     ErrorReporter* error_reporter);
+
+// How many bytes are used in a TfLiteEvalTensor instance. The byte length is
+// returned in out_bytes.
+TfLiteStatus TfLiteEvalTensorByteLength(const TfLiteEvalTensor* eval_tensor,
+                                        size_t* out_bytes);
+
+// Deduce output dimensions from input and allocate given size.
+// Useful for operators with two inputs where the largest input should equal the
+// output dimension.
+TfLiteStatus AllocateOutputDimensionsFromInput(TfLiteContext* context,
+                                               const TfLiteTensor* input1,
+                                               const TfLiteTensor* input2,
+                                               TfLiteTensor* output);
 
 }  // namespace tflite
 

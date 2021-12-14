@@ -26,7 +26,7 @@
  * limitations under the License.
  */
 
-#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/statistics_functions.h"
 
 /**
   @ingroup groupStats
@@ -45,9 +45,9 @@
   @param[out]    pIndex     index of maximum value returned here
   @return        none
  */
-#if defined(ARM_MATH_MVEI)
+#if defined(ARM_MATH_MVEI) && !defined(ARM_MATH_AUTOVECTORIZE)
 
-#include "arm_helium_utils.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_helium_utils.h"
 
 void arm_max_q31(
   const q31_t * pSrc,

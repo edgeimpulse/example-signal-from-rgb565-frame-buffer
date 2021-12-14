@@ -26,7 +26,7 @@
  * limitations under the License.
  */
 
-#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/filtering_functions.h"
 
 /**
   @ingroup groupFilters
@@ -54,9 +54,9 @@
                    Lastly, the accumulator is saturated to yield a result in 1.15 format.
  */
 
-#if defined(ARM_MATH_MVEI)
+#if defined(ARM_MATH_MVEI) && !defined(ARM_MATH_AUTOVECTORIZE)
 
-#include "arm_helium_utils.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_helium_utils.h"
 void arm_fir_interpolate_q15(
   const arm_fir_interpolate_instance_q15 * S,
   const q15_t * pSrc,

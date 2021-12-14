@@ -1,5 +1,5 @@
 /* Edge Impulse inferencing library
- * Copyright (c) 2020 EdgeImpulse Inc.
+ * Copyright (c) 2021 EdgeImpulse Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,8 @@
 #define _EI_CLASSIFIER_PORTING_H_
 
 #include <stdint.h>
-#include "tensorflow/lite/micro/debug_log.h"
+#include <stdlib.h>
+#include "edge-impulse-sdk/tensorflow/lite/micro/debug_log.h"
 
 #if defined(__cplusplus) && EI_C_LINKAGE == 1
 extern "C" {
@@ -40,7 +41,14 @@ typedef enum {
     EI_IMPULSE_CUBEAI_ERROR = -7,
     EI_IMPULSE_ALLOC_FAILED = -8,
     EI_IMPULSE_ONLY_SUPPORTED_FOR_IMAGES = -9,
-    EI_IMPULSE_UNSUPPORTED_INFERENCING_ENGINE = -10
+    EI_IMPULSE_UNSUPPORTED_INFERENCING_ENGINE = -10,
+    EI_IMPULSE_OUT_OF_MEMORY = -11,
+    EI_IMPULSE_NOT_SUPPORTED_WITH_I16 = -12,
+    EI_IMPULSE_INPUT_TENSOR_WAS_NULL = -13,
+    EI_IMPULSE_OUTPUT_TENSOR_WAS_NULL = -14,
+    EI_IMPULSE_SCORE_TENSOR_WAS_NULL = -15,
+    EI_IMPULSE_LABEL_TENSOR_WAS_NULL = -16,
+    EI_IMPULSE_TENSORRT_INIT_FAILED = -17
 } EI_IMPULSE_ERROR;
 
 /**
@@ -65,6 +73,18 @@ uint64_t ei_read_timer_ms();
 uint64_t ei_read_timer_us();
 
 /**
+ * Set Serial baudrate
+ */
+void ei_serial_set_baudrate(int baudrate);
+
+/**
+ * @brief      Connect to putchar of target
+ *
+ * @param[in]  c The chararater
+ */
+void ei_putchar(char c);
+
+/**
  * Print wrapper around printf()
  * This is used internally to print debug information.
  */
@@ -75,6 +95,21 @@ void ei_printf(const char *format, ...);
  * If not overriden, this will be sent through `ei_printf()`.
  */
 void ei_printf_float(float f);
+
+/**
+ * Wrapper around malloc
+ */
+void *ei_malloc(size_t size);
+
+/**
+ * Wrapper around calloc
+ */
+void *ei_calloc(size_t nitems, size_t size);
+
+/**
+ * Wrapper around free
+ */
+void ei_free(void *ptr);
 
 #if defined(__cplusplus) && EI_C_LINKAGE == 1
 }
@@ -121,14 +156,6 @@ void ei_printf_float(float f);
 #endif
 #endif
 
-#ifndef EI_PORTING_STM32_CUBEAI
-#if defined(USE_HAL_DRIVER) && !defined(__MBED__)
-#define EI_PORTING_STM32_CUBEAI      1
-#else
-#define EI_PORTING_STM32_CUBEAI      0
-#endif
-#endif
-
 #ifndef EI_PORTING_ZEPHYR
 #if defined(__ZEPHYR__)
 #define EI_PORTING_ZEPHYR      1
@@ -137,11 +164,27 @@ void ei_printf_float(float f);
 #endif
 #endif
 
+#ifndef EI_PORTING_STM32_CUBEAI
+#if defined(USE_HAL_DRIVER) && !defined(__MBED__) && EI_PORTING_ZEPHYR == 0
+#define EI_PORTING_STM32_CUBEAI      1
+#else
+#define EI_PORTING_STM32_CUBEAI      0
+#endif
+#endif
+
 #ifndef EI_PORTING_HIMAX
 #ifdef CPU_ARC
 #define EI_PORTING_HIMAX        1
 #else
 #define EI_PORTING_HIMAX        0
+#endif
+#endif
+
+#ifndef EI_PORTING_MINGW32
+#ifdef __MINGW32__
+#define EI_PORTING_MINGW32      1
+#else
+#define EI_PORTING_MINGW32      0
 #endif
 #endif
 // End load porting layer depending on target

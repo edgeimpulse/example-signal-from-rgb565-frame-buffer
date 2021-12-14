@@ -26,7 +26,7 @@
  * limitations under the License.
  */
 
-#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/filtering_functions.h"
 
 /**
   @ingroup groupFilters
@@ -56,10 +56,10 @@
  @remark
                    Refer to \ref arm_correlate_opt_q7() for a faster implementation of this function.
  */
-#if defined(ARM_MATH_MVEI)
-#include "arm_helium_utils.h"
+#if defined(ARM_MATH_MVEI) && !defined(ARM_MATH_AUTOVECTORIZE)
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_helium_utils.h"
 
-#include "arm_vec_filtering.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_vec_filtering.h"
 void arm_correlate_q7(
   const q7_t * pSrcA,
         uint32_t srcALen,

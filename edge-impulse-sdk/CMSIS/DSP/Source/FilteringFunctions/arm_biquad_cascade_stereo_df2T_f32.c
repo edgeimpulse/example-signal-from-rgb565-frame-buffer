@@ -26,7 +26,7 @@
  * limitations under the License.
  */
 
-#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/filtering_functions.h"
 
 /**
   @ingroup groupFilters
@@ -46,7 +46,7 @@
   @return        none
  */
 #if defined(ARM_MATH_MVEF) && !defined(ARM_MATH_AUTOVECTORIZE)
-#include "arm_helium_utils.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_helium_utils.h"
 
 void arm_biquad_cascade_stereo_df2T_f32(
   const arm_biquad_cascade_stereo_df2T_instance_f32 * S,
@@ -125,11 +125,11 @@ void arm_biquad_cascade_stereo_df2T_f32(
             /*
              * load {d1a, d1b, d1a, d1b}
              */
-            stateVec0 = vldrwq_gather_shifted_offset((uint32_t const *) scratch, loadIdxVec);
+            stateVec0 = (f32x4_t)vldrwq_gather_shifted_offset((uint32_t const *) scratch, loadIdxVec);
             /*
              * load {in0 in1 in0 in1}
              */
-            inVec = vldrwq_gather_shifted_offset((uint32_t const *) pIn, loadIdxVec);
+            inVec = (f32x4_t)vldrwq_gather_shifted_offset((uint32_t const *) pIn, loadIdxVec);
 
             stateVec0 = vfmaq(stateVec0, inVec, b0);
             *pOut++ = vgetq_lane(stateVec0, 0);

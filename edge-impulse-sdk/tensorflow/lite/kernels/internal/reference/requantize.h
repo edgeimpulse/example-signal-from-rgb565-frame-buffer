@@ -15,9 +15,9 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_KERNELS_INTERNAL_REFERENCE_REQUANTIZE_H_
 #define TENSORFLOW_LITE_KERNELS_INTERNAL_REFERENCE_REQUANTIZE_H_
 
-#include "ruy/profiler/instrumentation.h"  // from @ruy
-#include "tensorflow/lite/kernels/internal/common.h"
-#include "tensorflow/lite/kernels/internal/types.h"
+#include "edge-impulse-sdk/third_party/ruy/ruy/profiler/instrumentation.h"  // from @ruy
+#include "edge-impulse-sdk/tensorflow/lite/kernels/internal/common.h"
+#include "edge-impulse-sdk/tensorflow/lite/kernels/internal/types.h"
 
 namespace tflite {
 namespace reference_ops {
@@ -45,6 +45,7 @@ inline void Requantize(const input_type* input_data, int32_t size,
       for (int i = 0; i < size; ++i) {
         output_data[i] = input_data[i] ^ 0x80;
       }
+      return;
     }
   }
   static constexpr int32_t kMinOutput = std::numeric_limits<output_type>::min();

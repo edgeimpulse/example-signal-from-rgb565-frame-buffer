@@ -1,5 +1,5 @@
 /* Edge Impulse inferencing library
- * Copyright (c) 2020 EdgeImpulse Inc.
+ * Copyright (c) 2021 EdgeImpulse Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,14 @@
 /* Include ----------------------------------------------------------------- */
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /* Extern Silabs functions -------------------------------------------------- */
-extern "C" void UTIL_delay(uint32_t ms);
-extern "C" uint64_t UTIL_getTick(void);
+extern "C" {
+    void sl_sleeptimer_delay_millisecond(uint16_t time_ms);
+    uint32_t sl_sleeptimer_get_tick_count(void);
+    uint32_t sl_sleeptimer_tick_to_ms(uint32_t tick);
+}
 
 __attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled() {
     return EI_IMPULSE_OK;
@@ -39,18 +43,22 @@ __attribute__((weak)) EI_IMPULSE_ERROR ei_run_impulse_check_canceled() {
  * Cancelable sleep, can be triggered with signal from other thread
  */
 __attribute__((weak)) EI_IMPULSE_ERROR ei_sleep(int32_t time_ms) {
-    UTIL_delay(time_ms);
+    sl_sleeptimer_delay_millisecond(time_ms);
     return EI_IMPULSE_OK;
 }
 
 uint64_t ei_read_timer_ms()
 {
-    return UTIL_getTick();
+    return (uint32_t)sl_sleeptimer_tick_to_ms(sl_sleeptimer_get_tick_count());
 }
 
 uint64_t ei_read_timer_us()
 {
     return 0;
+}
+
+void ei_serial_set_baudrate(int baudrate)
+{
 }
 
 __attribute__((weak)) void ei_printf(const char *format, ...) {
@@ -62,6 +70,18 @@ __attribute__((weak)) void ei_printf(const char *format, ...) {
 
 __attribute__((weak)) void ei_printf_float(float f) {
     ei_printf("%f", f);
+}
+
+__attribute__((weak)) void *ei_malloc(size_t size) {
+    return malloc(size);
+}
+
+__attribute__((weak)) void *ei_calloc(size_t nitems, size_t size) {
+    return calloc(nitems, size);
+}
+
+__attribute__((weak)) void ei_free(void *ptr) {
+    free(ptr);
 }
 
 #if defined(__cplusplus) && EI_C_LINKAGE == 1

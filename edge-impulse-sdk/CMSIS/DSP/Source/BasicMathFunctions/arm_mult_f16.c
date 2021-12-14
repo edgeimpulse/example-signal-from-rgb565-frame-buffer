@@ -24,7 +24,7 @@
  * limitations under the License.
  */
 
-#include "arm_math_f16.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/basic_math_functions_f16.h"
 
 /**
   @ingroup groupMath
@@ -56,9 +56,10 @@
   @return        none
  */
 
-#if defined(ARM_MATH_MVEF) && !defined(ARM_MATH_AUTOVECTORIZE)
 
-#include "arm_helium_utils.h"
+#if defined(ARM_MATH_MVE_FLOAT16) && !defined(ARM_MATH_AUTOVECTORIZE) 
+
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_helium_utils.h"
 
 void arm_mult_f16(
   const float16_t * pSrcA,

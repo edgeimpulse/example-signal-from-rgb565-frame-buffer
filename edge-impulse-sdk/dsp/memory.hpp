@@ -1,5 +1,5 @@
 /* Edge Impulse inferencing library
- * Copyright (c) 2020 EdgeImpulse Inc.
+ * Copyright (c) 2021 EdgeImpulse Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,9 @@
 #ifndef _EIDSP_MEMORY_H_
 #define _EIDSP_MEMORY_H_
 
+// clang-format off
 #include <stdio.h>
-#include <stdlib.h>
+#include "../porting/ei_classifier_porting.h"
 
 extern size_t ei_memory_in_use;
 extern size_t ei_memory_peak_use;
@@ -48,13 +49,13 @@ namespace ei {
      * Typically you want to use ei::matrix_t types, as they keep track automatically.
      * @param bytes Number of bytes allocated
      */
-    #define ei_dsp_register_alloc_internal(fn, file, line, bytes) \
+    #define ei_dsp_register_alloc_internal(fn, file, line, bytes, ptr) \
         ei_memory_in_use += bytes; \
         if (ei_memory_in_use > ei_memory_peak_use) { \
             ei_memory_peak_use = ei_memory_in_use; \
         } \
-        ei_dsp_printf("alloc %lu bytes (in_use=%lu, peak=%lu) (%s@%s:%d)\n", \
-            bytes, ei_memory_in_use, ei_memory_peak_use, fn, file, line);
+        ei_dsp_printf("alloc %lu bytes (in_use=%lu, peak=%lu) (%s@%s:%d) %p\n", \
+            (unsigned long)bytes, (unsigned long)ei_memory_in_use, (unsigned long)ei_memory_peak_use, fn, file, line, ptr);
 
     /**
      * Register a matrix allocation. Don't call this function yourself,
@@ -63,22 +64,23 @@ namespace ei {
      * @param cols Number of columns
      * @param type_size Size of the data type
      */
-    #define ei_dsp_register_matrix_alloc_internal(fn, file, line, rows, cols, type_size) \
+    #define ei_dsp_register_matrix_alloc_internal(fn, file, line, rows, cols, type_size, ptr) \
         ei_memory_in_use += (rows * cols * type_size); \
         if (ei_memory_in_use > ei_memory_peak_use) { \
             ei_memory_peak_use = ei_memory_in_use; \
         } \
-        ei_dsp_printf("alloc matrix %hu x %hu = %lu bytes (in_use=%lu, peak=%lu) (%s@%s:%d)\n", \
-            rows, cols, rows * cols * type_size, ei_memory_in_use, ei_memory_peak_use, fn, file, line);
+        ei_dsp_printf("alloc matrix %lu x %lu = %lu bytes (in_use=%lu, peak=%lu) (%s@%s:%d) %p\n", \
+            (unsigned long)rows, (unsigned long)cols, (unsigned long)(rows * cols * type_size), (unsigned long)ei_memory_in_use, \
+                (unsigned long)ei_memory_peak_use, fn, file, line, ptr);
 
     /**
      * Register free'ing manually allocated memory (allocated through malloc/calloc)
      * @param bytes Number of bytes free'd
      */
-    #define ei_dsp_register_free_internal(fn, file, line, bytes) \
+    #define ei_dsp_register_free_internal(fn, file, line, bytes, ptr) \
         ei_memory_in_use -= bytes; \
-        ei_dsp_printf("free %lu bytes (in_use=%lu, peak=%lu) (%s@%s:%d)\n", \
-            bytes, ei_memory_in_use, ei_memory_peak_use, fn, file, line);
+        ei_dsp_printf("free %lu bytes (in_use=%lu, peak=%lu) (%s@%s:%d) %p\n", \
+            (unsigned long)bytes, (unsigned long)ei_memory_in_use, (unsigned long)ei_memory_peak_use, fn, file, line, ptr);
 
     /**
      * Register a matrix free. Don't call this function yourself,
@@ -87,36 +89,43 @@ namespace ei {
      * @param cols Number of columns
      * @param type_size Size of the data type
      */
-    #define ei_dsp_register_matrix_free_internal(fn, file, line, rows, cols, type_size) \
+    #define ei_dsp_register_matrix_free_internal(fn, file, line, rows, cols, type_size, ptr) \
         ei_memory_in_use -= (rows * cols * type_size); \
-        ei_dsp_printf("free matrix %hu x %hu = %lu bytes (in_use=%lu, peak=%lu) (%s@%s:%d)\n", \
-            rows, cols, rows * cols * type_size, ei_memory_in_use, ei_memory_peak_use, fn, file, line);
+        ei_dsp_printf("free matrix %lu x %lu = %lu bytes (in_use=%lu, peak=%lu) (%s@%s:%d) %p\n", \
+            (unsigned long)rows, (unsigned long)cols, (unsigned long)(rows * cols * type_size), \
+                (unsigned long)ei_memory_in_use, (unsigned long)ei_memory_peak_use, fn, file, line, ptr);
 
     #define ei_dsp_register_alloc(...) ei_dsp_register_alloc_internal(__func__, __FILE__, __LINE__, __VA_ARGS__)
     #define ei_dsp_register_matrix_alloc(...) ei_dsp_register_matrix_alloc_internal(__func__, __FILE__, __LINE__, __VA_ARGS__)
     #define ei_dsp_register_free(...) ei_dsp_register_free_internal(__func__, __FILE__, __LINE__, __VA_ARGS__)
     #define ei_dsp_register_matrix_free(...) ei_dsp_register_matrix_free_internal(__func__, __FILE__, __LINE__, __VA_ARGS__)
-    #define ei_dsp_malloc(...) memory::ei_malloc(__func__, __FILE__, __LINE__, __VA_ARGS__)
-    #define ei_dsp_calloc(...) memory::ei_calloc(__func__, __FILE__, __LINE__, __VA_ARGS__)
-    #define ei_dsp_realloc(...) memory::ei_realloc(__func__, __FILE__, __LINE__, __VA_ARGS__)
-    #define ei_dsp_free(...) memory::ei_free(__func__, __FILE__, __LINE__, __VA_ARGS__)
+    #define ei_dsp_malloc(...) memory::ei_wrapped_malloc(__func__, __FILE__, __LINE__, __VA_ARGS__)
+    #define ei_dsp_calloc(...) memory::ei_wrapped_calloc(__func__, __FILE__, __LINE__, __VA_ARGS__)
+    #define ei_dsp_free(...) memory::ei_wrapped_free(__func__, __FILE__, __LINE__, __VA_ARGS__)
     #define EI_DSP_MATRIX(name, ...) matrix_t name(__VA_ARGS__, NULL, __func__, __FILE__, __LINE__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
     #define EI_DSP_MATRIX_B(name, ...) matrix_t name(__VA_ARGS__, __func__, __FILE__, __LINE__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
     #define EI_DSP_QUANTIZED_MATRIX(name, ...) quantized_matrix_t name(__VA_ARGS__, NULL, __func__, __FILE__, __LINE__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
     #define EI_DSP_QUANTIZED_MATRIX_B(name, ...) quantized_matrix_t name(__VA_ARGS__, __func__, __FILE__, __LINE__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
+    #define EI_DSP_i16_MATRIX(name, rows, cols) matrix_i16_t name(rows, cols, NULL, __func__, __FILE__, __LINE__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
+    #define EI_DSP_i16_MATRIX_B(name, ...) matrix_i16_t name(__VA_ARGS__, __func__, __FILE__, __LINE__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
+    #define EI_DSP_i32_MATRIX(name, rows, cols) matrix_i32_t name(rows, cols, NULL, __func__, __FILE__, __LINE__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
+    #define EI_DSP_i32_MATRIX_B(name, ...) matrix_i32_t name(__VA_ARGS__, __func__, __FILE__, __LINE__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
 #else
     #define ei_dsp_register_alloc(...) (void)0
     #define ei_dsp_register_matrix_alloc(...) (void)0
     #define ei_dsp_register_free(...) (void)0
     #define ei_dsp_register_matrix_free(...) (void)0
-    #define ei_dsp_malloc malloc
-    #define ei_dsp_calloc calloc
-    #define ei_dsp_realloc realloc
-    #define ei_dsp_free(ptr, size) free(ptr)
+    #define ei_dsp_malloc ei_malloc
+    #define ei_dsp_calloc ei_calloc
+    #define ei_dsp_free(ptr, size) ei_free(ptr)
     #define EI_DSP_MATRIX(name, ...) matrix_t name(__VA_ARGS__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
     #define EI_DSP_MATRIX_B(name, ...) matrix_t name(__VA_ARGS__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
     #define EI_DSP_QUANTIZED_MATRIX(name, ...) quantized_matrix_t name(__VA_ARGS__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
     #define EI_DSP_QUANTIZED_MATRIX_B(name, ...) quantized_matrix_t name(__VA_ARGS__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
+    #define EI_DSP_i16_MATRIX(name, ...) matrix_i16_t name(__VA_ARGS__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
+    #define EI_DSP_i16_MATRIX_B(name, ...) matrix_i16_t name(__VA_ARGS__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
+    #define EI_DSP_i32_MATRIX(name, ...) matrix_i32_t name(__VA_ARGS__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
+    #define EI_DSP_i32_MATRIX_B(name, ...) matrix_i32_t name(__VA_ARGS__); if (!name.buffer) { EIDSP_ERR(EIDSP_OUT_OF_MEM); }
 #endif
 
 #if EIDSP_TRACK_ALLOCATIONS
@@ -128,10 +137,10 @@ public:
      * Allocate a new block of memory
      * @param size The size of the memory block, in bytes.
      */
-    static void *ei_malloc(const char *fn, const char *file, int line, size_t size) {
-        void *ptr = malloc(size);
+    static void *ei_wrapped_malloc(const char *fn, const char *file, int line, size_t size) {
+        void *ptr = ei_malloc(size);
         if (ptr) {
-            ei_dsp_register_alloc_internal(fn, file, line, size);
+            ei_dsp_register_alloc_internal(fn, file, line, size, ptr);
         }
         return ptr;
     }
@@ -142,10 +151,10 @@ public:
      * @param num Number of elements to allocate
      * @param size Size of each element
      */
-    static void *ei_calloc(const char *fn, const char *file, int line, size_t num, size_t size) {
-        void *ptr = calloc(num, size);
+    static void *ei_wrapped_calloc(const char *fn, const char *file, int line, size_t num, size_t size) {
+        void *ptr = ei_calloc(num, size);
         if (ptr) {
-            ei_dsp_register_alloc_internal(fn, file, line, num * size);
+            ei_dsp_register_alloc_internal(fn, file, line, num * size, ptr);
         }
         return ptr;
     }
@@ -155,28 +164,14 @@ public:
      * @param ptr Pointer to a memory block previously allocated with malloc, calloc or realloc.
      * @param size Size of the block of memory previously allocated.
      */
-    static void ei_free(const char *fn, const char *file, int line, void *ptr, size_t size) {
-        free(ptr);
-        ei_dsp_register_free_internal(fn, file, line, size);
-    }
-
-    /**
-     * Reallocates the given area of memory.
-     * @param ptr Pointer to the memory area to be reallocated.
-     * @param old_size Size of the block of memory previously allocated.
-     * @param new_size Size of the new block.
-     */
-    static void *ei_realloc(const char *fn, const char *file, int line, void *ptr, size_t old_size, size_t new_size) {
-        void *new_ptr = realloc(ptr, new_size);
-        if (new_ptr) {
-            ei_dsp_register_free_internal(fn, file, line, old_size);
-            ei_dsp_register_alloc_internal(fn, file, line, new_size);
-        }
-        return new_ptr;
+    static void ei_wrapped_free(const char *fn, const char *file, int line, void *ptr, size_t size) {
+        ei_free(ptr);
+        ei_dsp_register_free_internal(fn, file, line, size, ptr);
     }
 };
 #endif // #if EIDSP_TRACK_ALLOCATIONS
 
 } // namespace ei
 
+// clang-format on
 #endif // _EIDSP_MEMORY_H_

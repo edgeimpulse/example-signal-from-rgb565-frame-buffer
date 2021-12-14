@@ -26,7 +26,7 @@
  * limitations under the License.
  */
 
-#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_math.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/dsp/basic_math_functions.h"
 
 /**
   @ingroup groupMath
@@ -49,9 +49,9 @@
                    The function uses saturating arithmetic.
                    Results outside of the allowable Q7 range [0x80 0x7F] will be saturated.
  */
-#if defined(ARM_MATH_MVEI)
+#if defined(ARM_MATH_MVEI) && !defined(ARM_MATH_AUTOVECTORIZE)
 
-#include "arm_helium_utils.h"
+#include "edge-impulse-sdk/CMSIS/DSP/Include/arm_helium_utils.h"
 
 void arm_sub_q7(
     const q7_t * pSrcA,

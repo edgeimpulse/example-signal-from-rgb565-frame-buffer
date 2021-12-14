@@ -22,54 +22,83 @@
 #ifndef _EI_CLASSIFIER_MODEL_METADATA_H_
 #define _EI_CLASSIFIER_MODEL_METADATA_H_
 
+#include <stdint.h>
+
 #define EI_CLASSIFIER_NONE                       255
 #define EI_CLASSIFIER_UTENSOR                    1
 #define EI_CLASSIFIER_TFLITE                     2
 #define EI_CLASSIFIER_CUBEAI                     3
+#define EI_CLASSIFIER_TFLITE_FULL                4
+#define EI_CLASSIFIER_TENSAIFLOW                 5
+#define EI_CLASSIFIER_TENSORRT                   6
 
+#define EI_CLASSIFIER_SENSOR_UNKNOWN             -1
 #define EI_CLASSIFIER_SENSOR_MICROPHONE          1
 #define EI_CLASSIFIER_SENSOR_ACCELEROMETER       2
 #define EI_CLASSIFIER_SENSOR_CAMERA              3
+#define EI_CLASSIFIER_SENSOR_9DOF                4
+#define EI_CLASSIFIER_SENSOR_ENVIRONMENTAL       5
 
 // These must match the enum values in TensorFlow Lite's "TfLiteType"
 #define EI_CLASSIFIER_DATATYPE_FLOAT32           1
 #define EI_CLASSIFIER_DATATYPE_INT8              9
 
+#define EI_CLASSIFIER_PROJECT_ID                 21342
+#define EI_CLASSIFIER_PROJECT_OWNER              "AlexE"
+#define EI_CLASSIFIER_PROJECT_NAME               "Calc-Mentos"
+#define EI_CLASSIFIER_PROJECT_DEPLOY_VERSION     19
 #define EI_CLASSIFIER_NN_INPUT_FRAME_SIZE        27648
 #define EI_CLASSIFIER_RAW_SAMPLE_COUNT           9216
 #define EI_CLASSIFIER_RAW_SAMPLES_PER_FRAME      1
 #define EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE       (EI_CLASSIFIER_RAW_SAMPLE_COUNT * EI_CLASSIFIER_RAW_SAMPLES_PER_FRAME)
 #define EI_CLASSIFIER_INPUT_WIDTH                96
 #define EI_CLASSIFIER_INPUT_HEIGHT               96
-#define EI_CLASSIFIER_INTERVAL_MS                0
-#define EI_CLASSIFIER_OUT_TENSOR_NAME            "dense_1/Softmax_2:0"
-#define EI_CLASSIFIER_LABEL_COUNT                3
+#define EI_CLASSIFIER_INPUT_FRAMES               1
+#define EI_CLASSIFIER_INTERVAL_MS                1
+#define EI_CLASSIFIER_LABEL_COUNT                2
 #define EI_CLASSIFIER_HAS_ANOMALY                0
 #define EI_CLASSIFIER_FREQUENCY                  0
+#define EI_CLASSIFIER_USE_QUANTIZED_DSP_BLOCK    0
+#define EI_CLASSIFIER_HAS_MODEL_VARIABLES        1
 
-#define EI_CLASSIFIER_TFLITE_ARENA_SIZE          450726
+
+#define EI_CLASSIFIER_OBJECT_DETECTION           0
+
+
+#define EI_CLASSIFIER_TFLITE_ARENA_SIZE          85398
 #define EI_CLASSIFIER_TFLITE_INPUT_DATATYPE      EI_CLASSIFIER_DATATYPE_INT8
 #define EI_CLASSIFIER_TFLITE_INPUT_QUANTIZED     1
 #define EI_CLASSIFIER_TFLITE_INPUT_SCALE         0.003921568859368563
 #define EI_CLASSIFIER_TFLITE_INPUT_ZEROPOINT     -128
 #define EI_CLASSIFIER_TFLITE_OUTPUT_DATATYPE     EI_CLASSIFIER_DATATYPE_INT8
-#define EI_CLASSIFIER_TFLITE_OUTPUT_QUANTIZED     1
+#define EI_CLASSIFIER_TFLITE_OUTPUT_QUANTIZED    1
 #define EI_CLASSIFIER_TFLITE_OUTPUT_SCALE        0.00390625
 #define EI_CLASSIFIER_TFLITE_OUTPUT_ZEROPOINT    -128
 #define EI_CLASSIFIER_INFERENCING_ENGINE         EI_CLASSIFIER_TFLITE
-#define EI_CLASSIFIER_COMPILED                   1
-#define EI_CLASSIFIER_SENSOR                     EI_CLASSIFIER_SENSOR_CAMERA
+#define EI_CLASSIFIER_COMPILED                   0
 #define EI_CLASSIFIER_HAS_TFLITE_OPS_RESOLVER    1
 
+
+#define EI_CLASSIFIER_HAS_FFT_INFO               0
+
 #define EI_CLASSIFIER_SENSOR                     EI_CLASSIFIER_SENSOR_CAMERA
-#define EI_CLASSIFIER_SLICE_SIZE                 (EI_CLASSIFIER_RAW_SAMPLE_COUNT / EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW)
 #ifndef EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW
 #define EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW    4
 #endif // EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW
+#define EI_CLASSIFIER_SLICE_SIZE                 (EI_CLASSIFIER_RAW_SAMPLE_COUNT / EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW)
 
-const char* ei_classifier_inferencing_categories[] = { "lamp", "plant", "unknown" };
+#if EI_CLASSIFIER_INFERENCING_ENGINE == EI_CLASSIFIER_TFLITE && EI_CLASSIFIER_USE_FULL_TFLITE == 1
+#undef EI_CLASSIFIER_INFERENCING_ENGINE
+#undef EI_CLASSIFIER_HAS_TFLITE_OPS_RESOLVER
+#define EI_CLASSIFIER_INFERENCING_ENGINE          EI_CLASSIFIER_TFLITE_FULL
+#define EI_CLASSIFIER_HAS_TFLITE_OPS_RESOLVER     0
+#if EI_CLASSIFIER_COMPILED == 1
+#error "Cannot use full TensorFlow Lite with EON"
+#endif
+#endif // EI_CLASSIFIER_INFERENCING_ENGINE == EI_CLASSIFIER_TFLITE && EI_CLASSIFIER_USE_FULL_TFLITE == 1
 
 typedef struct {
+    uint16_t implementation_version;
     int axes;
     float scale_axes;
     bool average;
@@ -82,11 +111,13 @@ typedef struct {
 } ei_dsp_config_flatten_t;
 
 typedef struct {
+    uint16_t implementation_version;
     int axes;
     const char * channels;
 } ei_dsp_config_image_t;
 
 typedef struct {
+    uint16_t implementation_version;
     int axes;
     int num_cepstral;
     float frame_length;
@@ -101,6 +132,7 @@ typedef struct {
 } ei_dsp_config_mfcc_t;
 
 typedef struct {
+    uint16_t implementation_version;
     int axes;
     float frame_length;
     float frame_stride;
@@ -109,14 +141,17 @@ typedef struct {
     int low_frequency;
     int high_frequency;
     int win_size;
+    int noise_floor_db;
 } ei_dsp_config_mfe_t;
 
 typedef struct {
+    uint16_t implementation_version;
     int axes;
     float scale_axes;
 } ei_dsp_config_raw_t;
 
 typedef struct {
+    uint16_t implementation_version;
     int axes;
     float scale_axes;
     const char * filter_type;
@@ -129,16 +164,25 @@ typedef struct {
 } ei_dsp_config_spectral_analysis_t;
 
 typedef struct {
+    uint16_t implementation_version;
     int axes;
     float frame_length;
     float frame_stride;
     int fft_length;
+    int noise_floor_db;
     bool show_axes;
 } ei_dsp_config_spectrogram_t;
 
-ei_dsp_config_image_t ei_dsp_config_36 = {
-    1,
-    "RGB"
-};
+typedef struct {
+    uint16_t implementation_version;
+    int axes;
+    float frame_length;
+    float frame_stride;
+    int num_filters;
+    int fft_length;
+    int low_frequency;
+    int high_frequency;
+    float pre_cof;
+} ei_dsp_config_audio_syntiant_t;
 
 #endif // _EI_CLASSIFIER_MODEL_METADATA_H_
